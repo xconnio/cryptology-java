@@ -85,7 +85,11 @@ public class SecretBox {
     }
 
     private void checkLength(byte[] data, int size) {
-        if (data == null || data.length != size)
-            throw new IllegalArgumentException("Invalid size: " + data.length);
+        if (data == null)
+            throw new NullPointerException("Input array is null.");
+        else if (data.length != size) {
+            throw new IllegalArgumentException("Invalid array length: " + data.length +
+                    ". Length should be " + size);
+        }
     }
 }
