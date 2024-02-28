@@ -12,30 +12,30 @@ public class SecretBox {
 
     static int MAC_SIZE = 16;
 
-    public static byte[] box(byte[] message, byte[] key) {
-        checkLength(key, Util.SECRET_KEY_LEN);
+    public static byte[] box(byte[] message, byte[] privateKey) {
+        checkLength(privateKey, Util.SECRET_KEY_LEN);
 
         byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
         byte[] output = new byte[message.length + MAC_SIZE + Util.NONCE_SIZE];
-        box(output, nonce, message, key);
+        box(output, nonce, message, privateKey);
 
         return output;
     }
 
-    public static void box(byte[] output, byte[] message, byte[] key) {
-        checkLength(key, Util.SECRET_KEY_LEN);
+    public static void box(byte[] output, byte[] message, byte[] privateKey) {
+        checkLength(privateKey, Util.SECRET_KEY_LEN);
 
         byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
-        box(output, nonce, message, key);
+        box(output, nonce, message, privateKey);
     }
 
-    static void box(byte[] output, byte[] nonce, byte[] plaintext, byte[] key) {
+    static void box(byte[] output, byte[] nonce, byte[] plaintext, byte[] privateKey) {
         checkLength(nonce, Util.NONCE_SIZE);
 
         XSalsa20Engine cipher = new XSalsa20Engine();
         Poly1305 mac = new Poly1305();
 
-        cipher.init(true, new ParametersWithIV(new KeyParameter(key), nonce));
+        cipher.init(true, new ParametersWithIV(new KeyParameter(privateKey), nonce));
         byte[] subKey = new byte[Util.SECRET_KEY_LEN];
         cipher.processBytes(subKey, 0, Util.SECRET_KEY_LEN, subKey, 0);
         byte[] cipherWithoutNonce = new byte[plaintext.length + mac.getMacSize()];
@@ -51,56 +51,56 @@ public class SecretBox {
     }
 
 
-    public static byte[] boxOpen(byte[] ciphertext, byte[] key) {
-        checkLength(key, Util.SECRET_KEY_LEN);
+    public static byte[] boxOpen(byte[] ciphertext, byte[] privateKey) {
+        checkLength(privateKey, Util.SECRET_KEY_LEN);
 
         byte[] nonce = Arrays.copyOfRange(ciphertext, 0, Util.NONCE_SIZE);
         byte[] message = Arrays.copyOfRange(ciphertext, Util.NONCE_SIZE,
                 ciphertext.length);
         byte[] plainText = new byte[message.length - MAC_SIZE];
-        boxOpen(plainText, nonce, message, key);
+        boxOpen(plainText, nonce, message, privateKey);
 
         return plainText;
     }
 
-    public static void boxOpen(byte[] output, byte[] ciphertext, byte[] key) {
-        checkLength(key, Util.SECRET_KEY_LEN);
+    public static void boxOpen(byte[] output, byte[] ciphertext, byte[] privateKey) {
+        checkLength(privateKey, Util.SECRET_KEY_LEN);
 
         byte[] nonce = Arrays.copyOfRange(ciphertext, 0, Util.NONCE_SIZE);
         byte[] message = Arrays.copyOfRange(ciphertext, Util.NONCE_SIZE,
                 ciphertext.length);
 
-        boxOpen(output, nonce, message, key);
+        boxOpen(output, nonce, message, privateKey);
     }
 
-    static void boxOpen(byte[] output, byte[] nonce, byte[] ciphertext, byte[] key) {
+    static void boxOpen(byte[] output, byte[] nonce, byte[] ciphertext, byte[] privateKey) {
         checkLength(nonce, Util.NONCE_SIZE);
 
-        XSalsa20Engine xsalsa20 = new XSalsa20Engine();
-        Poly1305 poly1305 = new Poly1305();
+        XSalsa20Engine cipher = new XSalsa20Engine();
+        Poly1305 mac = new Poly1305();
 
-        xsalsa20.init(false, new ParametersWithIV(new KeyParameter(key), nonce));
+        cipher.init(false, new ParametersWithIV(new KeyParameter(privateKey), nonce));
         byte[] sk = new byte[Util.SECRET_KEY_LEN];
-        xsalsa20.processBytes(sk, 0, sk.length, sk, 0);
+        cipher.processBytes(sk, 0, sk.length, sk, 0);
 
         // hash ciphertext
-        poly1305.init(new KeyParameter(sk));
-        int len = Math.max(ciphertext.length - poly1305.getMacSize(), 0);
-        poly1305.update(ciphertext, poly1305.getMacSize(), len);
-        byte[] calculatedMAC = new byte[poly1305.getMacSize()];
-        poly1305.doFinal(calculatedMAC, 0);
+        mac.init(new KeyParameter(sk));
+        int len = Math.max(ciphertext.length - mac.getMacSize(), 0);
+        mac.update(ciphertext, mac.getMacSize(), len);
+        byte[] calculatedMAC = new byte[mac.getMacSize()];
+        mac.doFinal(calculatedMAC, 0);
 
         // extract mac
-        final byte[] presentedMAC = new byte[poly1305.getMacSize()];
+        final byte[] presentedMAC = new byte[mac.getMacSize()];
         System.arraycopy(
-                ciphertext, 0, presentedMAC, 0, Math.min(ciphertext.length, poly1305.getMacSize()));
+                ciphertext, 0, presentedMAC, 0, Math.min(ciphertext.length, mac.getMacSize()));
 
         if (!MessageDigest.isEqual(calculatedMAC, presentedMAC)) {
             throw new IllegalArgumentException("Invalid MAC");
         }
 
 
-        xsalsa20.processBytes(ciphertext, poly1305.getMacSize(), output.length, output, 0);
+        cipher.processBytes(ciphertext, mac.getMacSize(), output.length, output, 0);
     }
 
     static void checkLength(byte[] data, int size) {
