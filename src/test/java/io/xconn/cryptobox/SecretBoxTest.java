@@ -3,7 +3,7 @@ package io.xconn.cryptobox;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static io.xconn.cryptobox.SecretBox.Poly1305MacSize;
+import static io.xconn.cryptobox.SecretBox.MAC_SIZE;
 import static io.xconn.cryptobox.SecretBox.box;
 import static io.xconn.cryptobox.SecretBox.boxOpen;
 import static io.xconn.cryptobox.SecretBox.checkLength;
@@ -32,7 +32,7 @@ public class SecretBoxTest {
     @Test
     public void testEncryptAndDecryptOutput() {
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = new byte[Util.NONCE_SIZE + Poly1305MacSize + message.length];
+        byte[] encrypted = new byte[Util.NONCE_SIZE + MAC_SIZE + message.length];
         box(encrypted, message, key);
         byte[] decrypted = new byte[message.length];
         boxOpen(decrypted, encrypted, key);
@@ -43,7 +43,7 @@ public class SecretBoxTest {
     public void testEncryptAndDecryptWithNonce() {
         byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = new byte[message.length + Util.NONCE_SIZE + Poly1305MacSize];
+        byte[] encrypted = new byte[message.length + Util.NONCE_SIZE + MAC_SIZE];
         box(encrypted, nonce, message, key);
         byte[] decrypted = boxOpen(encrypted, key);
         assertArrayEquals(message, decrypted);

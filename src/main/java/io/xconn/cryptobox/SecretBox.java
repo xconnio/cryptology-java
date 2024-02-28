@@ -10,13 +10,13 @@ import java.util.Arrays;
 
 public class SecretBox {
 
-    static int Poly1305MacSize = 16;
+    static int MAC_SIZE = 16;
 
     public static byte[] box(byte[] message, byte[] key) {
         checkLength(key, Util.SECRET_KEY_LEN);
 
         byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
-        byte[] output = new byte[message.length + Poly1305MacSize + Util.NONCE_SIZE];
+        byte[] output = new byte[message.length + MAC_SIZE + Util.NONCE_SIZE];
         box(output, nonce, message, key);
 
         return output;
@@ -32,19 +32,19 @@ public class SecretBox {
     static void box(byte[] output, byte[] nonce, byte[] plaintext, byte[] key) {
         checkLength(nonce, Util.NONCE_SIZE);
 
-        XSalsa20Engine xsalsa20 = new XSalsa20Engine();
-        Poly1305 poly1305 = new Poly1305();
+        XSalsa20Engine cipher = new XSalsa20Engine();
+        Poly1305 mac = new Poly1305();
 
-        xsalsa20.init(true, new ParametersWithIV(new KeyParameter(key), nonce));
+        cipher.init(true, new ParametersWithIV(new KeyParameter(key), nonce));
         byte[] subKey = new byte[Util.SECRET_KEY_LEN];
-        xsalsa20.processBytes(subKey, 0, Util.SECRET_KEY_LEN, subKey, 0);
-        byte[] cipherWithoutNonce = new byte[plaintext.length + poly1305.getMacSize()];
-        xsalsa20.processBytes(plaintext, 0, plaintext.length, cipherWithoutNonce, poly1305.getMacSize());
+        cipher.processBytes(subKey, 0, Util.SECRET_KEY_LEN, subKey, 0);
+        byte[] cipherWithoutNonce = new byte[plaintext.length + mac.getMacSize()];
+        cipher.processBytes(plaintext, 0, plaintext.length, cipherWithoutNonce, mac.getMacSize());
 
-        // hash ciphertext and prepend mac to ciphertext
-        poly1305.init(new KeyParameter(subKey));
-        poly1305.update(cipherWithoutNonce, poly1305.getMacSize(), plaintext.length);
-        poly1305.doFinal(cipherWithoutNonce, 0);
+        // hash the ciphertext
+        mac.init(new KeyParameter(subKey));
+        mac.update(cipherWithoutNonce, mac.getMacSize(), plaintext.length);
+        mac.doFinal(cipherWithoutNonce, 0);
 
         System.arraycopy(nonce, 0, output, 0, nonce.length);
         System.arraycopy(cipherWithoutNonce, 0, output, nonce.length, cipherWithoutNonce.length);
@@ -57,7 +57,7 @@ public class SecretBox {
         byte[] nonce = Arrays.copyOfRange(ciphertext, 0, Util.NONCE_SIZE);
         byte[] message = Arrays.copyOfRange(ciphertext, Util.NONCE_SIZE,
                 ciphertext.length);
-        byte[] plainText = new byte[message.length - Poly1305MacSize];
+        byte[] plainText = new byte[message.length - MAC_SIZE];
         boxOpen(plainText, nonce, message, key);
 
         return plainText;

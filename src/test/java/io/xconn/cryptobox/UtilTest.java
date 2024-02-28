@@ -16,5 +16,4 @@ public class UtilTest {
         assertNotNull(randomBytes);
         assertEquals(size, randomBytes.length);
     }
-
 }
