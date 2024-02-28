@@ -27,7 +27,7 @@ public class Util {
         return privateKey.generatePublicKey().getEncoded();
     }
 
-    public static KeyPair<byte[], byte[]> generateX25519KeyPair() {
+    public static KeyPair generateX25519KeyPair() {
         SecureRandom random = new SecureRandom();
         X25519KeyGenerationParameters params = new X25519KeyGenerationParameters(random);
         X25519KeyPairGenerator generator = new X25519KeyPairGenerator();
@@ -38,6 +38,6 @@ public class Util {
         X25519PrivateKeyParameters privateKeyParams = (X25519PrivateKeyParameters) keyPair.getPrivate();
         X25519PublicKeyParameters publicKeyParams = (X25519PublicKeyParameters) keyPair.getPublic();
 
-        return new KeyPair<>(publicKeyParams.getEncoded(), privateKeyParams.getEncoded());
+        return new KeyPair(publicKeyParams.getEncoded(), privateKeyParams.getEncoded());
     }
 }

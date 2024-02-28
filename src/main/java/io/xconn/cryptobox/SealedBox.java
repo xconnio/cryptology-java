@@ -8,7 +8,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.math.ec.rfc7748.X25519;
 import org.bouncycastle.util.Arrays;
 
-import static io.xconn.cryptobox.SecretBox.boxOpen;
 import static io.xconn.cryptobox.Util.MAC_SIZE;
 import static io.xconn.cryptobox.Util.PUBLIC_KEY_BYTES;
 import static io.xconn.cryptobox.Util.getX25519PublicKey;
@@ -23,7 +22,7 @@ public class SealedBox {
     }
 
     public static void seal(byte[] output, byte[] message, byte[] recipientPublicKey) {
-        KeyPair<byte[], byte[]> keyPair = Util.generateX25519KeyPair();
+        KeyPair keyPair = Util.generateX25519KeyPair();
         byte[] nonce = createNonce(keyPair.getPublicKey(), recipientPublicKey);
         byte[] sharedSecret = computeSharedSecret(recipientPublicKey, keyPair.getPrivateKey());
 
@@ -84,6 +83,6 @@ public class SealedBox {
         byte[] nonce = createNonce(ephemeralPublicKey, getX25519PublicKey(privateKey));
         byte[] sharedSecret = computeSharedSecret(ephemeralPublicKey, privateKey);
 
-        boxOpen(output, nonce, ciphertext, sharedSecret);
+        SecretBox.boxOpen(output, nonce, ciphertext, sharedSecret);
     }
 }

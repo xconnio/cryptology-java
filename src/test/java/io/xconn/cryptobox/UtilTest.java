@@ -37,7 +37,7 @@ public class UtilTest {
 
     @Test
     void testGenerateX25519KeyPair() {
-        KeyPair<byte[], byte[]> keyPair = generateX25519KeyPair();
+        KeyPair keyPair = generateX25519KeyPair();
 
         assertNotNull(keyPair);
         assertNotNull(keyPair.getPublicKey());

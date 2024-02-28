@@ -22,6 +22,7 @@ import org.bouncycastle.util.Pack;
 
 /**
  * An implementation of the HSalsa20 hash based on the Bouncy Castle Salsa20 core.
+ * Taken from https://github.com/codahale/xsalsa20poly1305
  */
 class HSalsa20 {
 

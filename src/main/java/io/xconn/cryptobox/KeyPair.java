@@ -1,19 +1,19 @@
 package io.xconn.cryptobox;
 
-public class KeyPair<PublicKey, PrivateKey> {
-    private final PublicKey publicKey;
-    private final PrivateKey privateKey;
+public class KeyPair {
+    private final byte[] publicKey;
+    private final byte[] privateKey;
 
-    public KeyPair(PublicKey publicKey, PrivateKey privateKey) {
+    public KeyPair(byte[] publicKey, byte[] privateKey) {
         this.publicKey = publicKey;
         this.privateKey = privateKey;
     }
 
-    public PublicKey getPublicKey() {
+    public byte[] getPublicKey() {
         return publicKey;
     }
 
-    public PrivateKey getPrivateKey() {
+    public byte[] getPrivateKey() {
         return privateKey;
     }
 }
