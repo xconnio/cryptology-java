@@ -3,8 +3,10 @@ package io.xconn.cryptobox;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import static io.xconn.cryptobox.SecretBox.Poly1305MacSize;
 import static io.xconn.cryptobox.SecretBox.box;
 import static io.xconn.cryptobox.SecretBox.boxOpen;
+import static io.xconn.cryptobox.SecretBox.checkLength;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,10 +30,21 @@ public class SecretBoxTest {
     }
 
     @Test
+    public void testEncryptAndDecryptOutput() {
+        byte[] message = "Hello, World!".getBytes();
+        byte[] encrypted = new byte[Util.NONCE_SIZE + Poly1305MacSize + message.length];
+        box(encrypted, message, key);
+        byte[] decrypted = new byte[message.length];
+        boxOpen(decrypted, encrypted, key);
+        assertArrayEquals(message, decrypted);
+    }
+
+    @Test
     public void testEncryptAndDecryptWithNonce() {
         byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = box(nonce, message, key);
+        byte[] encrypted = new byte[message.length + Util.NONCE_SIZE + Poly1305MacSize];
+        box(encrypted, nonce, message, key);
         byte[] decrypted = boxOpen(encrypted, key);
         assertArrayEquals(message, decrypted);
     }
@@ -60,4 +73,13 @@ public class SecretBoxTest {
         assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, key));
     }
 
+    @Test
+    void testCheckLength() {
+        assertThrows(NullPointerException.class, () -> checkLength(null, 16));
+
+        byte[] data = new byte[16];
+        checkLength(data, 16);
+
+        assertThrows(IllegalArgumentException.class, () -> checkLength(data, 32));
+    }
 }

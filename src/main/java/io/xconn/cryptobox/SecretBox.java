@@ -10,14 +10,26 @@ import java.util.Arrays;
 
 public class SecretBox {
 
+    static int Poly1305MacSize = 16;
+
     public static byte[] box(byte[] message, byte[] key) {
         checkLength(key, Util.SECRET_KEY_LEN);
 
         byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
-        return box(nonce, message, key);
+        byte[] output = new byte[message.length + Poly1305MacSize + Util.NONCE_SIZE];
+        box(output, nonce, message, key);
+
+        return output;
     }
 
-    static byte[] box(byte[] nonce, byte[] plaintext, byte[] key) {
+    public static void box(byte[] output, byte[] message, byte[] key) {
+        checkLength(key, Util.SECRET_KEY_LEN);
+
+        byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
+        box(output, nonce, message, key);
+    }
+
+    static void box(byte[] output, byte[] nonce, byte[] plaintext, byte[] key) {
         checkLength(nonce, Util.NONCE_SIZE);
 
         XSalsa20Engine xsalsa20 = new XSalsa20Engine();
@@ -34,13 +46,10 @@ public class SecretBox {
         poly1305.update(cipherWithoutNonce, poly1305.getMacSize(), plaintext.length);
         poly1305.doFinal(cipherWithoutNonce, 0);
 
-        byte[] ciphertext = new byte[cipherWithoutNonce.length +
-                Util.NONCE_SIZE];
-        System.arraycopy(nonce, 0, ciphertext, 0, nonce.length);
-        System.arraycopy(cipherWithoutNonce, 0, ciphertext, nonce.length,
-                cipherWithoutNonce.length);
-        return ciphertext;
+        System.arraycopy(nonce, 0, output, 0, nonce.length);
+        System.arraycopy(cipherWithoutNonce, 0, output, nonce.length, cipherWithoutNonce.length);
     }
+
 
     public static byte[] boxOpen(byte[] ciphertext, byte[] key) {
         checkLength(key, Util.SECRET_KEY_LEN);
@@ -48,10 +57,23 @@ public class SecretBox {
         byte[] nonce = Arrays.copyOfRange(ciphertext, 0, Util.NONCE_SIZE);
         byte[] message = Arrays.copyOfRange(ciphertext, Util.NONCE_SIZE,
                 ciphertext.length);
-        return boxOpen(nonce, message, key);
+        byte[] plainText = new byte[message.length - Poly1305MacSize];
+        boxOpen(plainText, nonce, message, key);
+
+        return plainText;
     }
 
-    static byte[] boxOpen(byte[] nonce, byte[] ciphertext, byte[] key) {
+    public static void boxOpen(byte[] output, byte[] ciphertext, byte[] key) {
+        checkLength(key, Util.SECRET_KEY_LEN);
+
+        byte[] nonce = Arrays.copyOfRange(ciphertext, 0, Util.NONCE_SIZE);
+        byte[] message = Arrays.copyOfRange(ciphertext, Util.NONCE_SIZE,
+                ciphertext.length);
+
+        boxOpen(output, nonce, message, key);
+    }
+
+    static void boxOpen(byte[] output, byte[] nonce, byte[] ciphertext, byte[] key) {
         checkLength(nonce, Util.NONCE_SIZE);
 
         XSalsa20Engine xsalsa20 = new XSalsa20Engine();
@@ -77,9 +99,8 @@ public class SecretBox {
             throw new IllegalArgumentException("Invalid MAC");
         }
 
-        byte[] plaintext = new byte[len];
-        xsalsa20.processBytes(ciphertext, poly1305.getMacSize(), plaintext.length, plaintext, 0);
-        return plaintext;
+
+        xsalsa20.processBytes(ciphertext, poly1305.getMacSize(), output.length, output, 0);
     }
 
     static void checkLength(byte[] data, int size) {
