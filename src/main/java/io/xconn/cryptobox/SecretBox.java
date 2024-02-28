@@ -8,9 +8,9 @@ import org.bouncycastle.crypto.macs.Poly1305;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
-public class SecretBox {
+import static io.xconn.cryptobox.Util.MAC_SIZE;
 
-    static int MAC_SIZE = 16;
+public class SecretBox {
 
     public static byte[] box(byte[] message, byte[] privateKey) {
         checkLength(privateKey, Util.SECRET_KEY_LEN);
