@@ -3,67 +3,61 @@ package io.xconn.cryptobox;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import static io.xconn.cryptobox.SecretBox.box;
+import static io.xconn.cryptobox.SecretBox.boxOpen;
+
+import org.bouncycastle.util.encoders.Hex;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class SecretBoxTest {
 
-    @Test
-    public void testConstructor() {
-        // test with valid key
-        new SecretBox(new byte[32]);
+    private static byte[] key;
 
-        // test with invalid key
-        assertThrows(IllegalArgumentException.class, () -> new SecretBox(new byte[16]));
-
-        // test with null key
-        assertThrows(NullPointerException.class, () -> new SecretBox(null));
+    @BeforeAll
+    public static void setUp() {
+        key = Hex.decode("cd281cb85a967c5fc249b31c1c6503a181841526182d4f6e63c81e4213a45fb7");
     }
 
     @Test
     public void testEncryptAndDecrypt() {
-        SecretBox secretBox = new SecretBox(new byte[32]);
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = secretBox.encrypt(message);
-        byte[] decrypted = secretBox.decrypt(encrypted);
+        byte[] encrypted = box(message, key);
+        byte[] decrypted = boxOpen(encrypted, key);
         assertArrayEquals(message, decrypted);
     }
 
     @Test
     public void testEncryptAndDecryptWithNonce() {
-        SecretBox secretBox = new SecretBox(new byte[32]);
         byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = secretBox.encrypt(nonce, message);
-        byte[] decrypted = secretBox.decrypt(encrypted);
+        byte[] encrypted = box(nonce, message, key);
+        byte[] decrypted = boxOpen(encrypted, key);
         assertArrayEquals(message, decrypted);
     }
 
     @Test
     public void testEncryptAndDecryptWithInvalidMAC() {
-        SecretBox secretBox = new SecretBox(new byte[32]);
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = secretBox.encrypt(message);
+        byte[] encrypted = box(message, key);
         encrypted[encrypted.length - 1] ^= 0xFF; // Modify last byte
-        assertThrows(IllegalArgumentException.class, () -> secretBox.decrypt(encrypted));
+        assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, key));
     }
 
     @Test
     public void testEncryptAndDecryptWithInvalidNonce() {
-        SecretBox secretBox = new SecretBox(new byte[32]);
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = secretBox.encrypt(message);
+        byte[] encrypted = box(message, key);
         encrypted[0] ^= 0xFF; // Modify first byte
-        assertThrows(IllegalArgumentException.class, () -> secretBox.decrypt(encrypted));
+        assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, key));
     }
 
     @Test
     public void testEncryptAndDecryptWithModifiedCiphertext() {
-        byte[] key = new byte[32];
-        SecretBox secretBox = new SecretBox(key);
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = secretBox.encrypt(message);
+        byte[] encrypted = box(message, key);
         encrypted[Util.NONCE_SIZE + 1] ^= 0xFF; // Modify the byte next to nonce
-        assertThrows(IllegalArgumentException.class, () -> secretBox.decrypt(encrypted));
+        assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, key));
     }
 
 }

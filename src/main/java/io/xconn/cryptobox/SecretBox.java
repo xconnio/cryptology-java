@@ -9,25 +9,21 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 
 public class SecretBox {
-    private final byte[] mKey;
 
-    public SecretBox(byte[] key) {
+    public static byte[] box(byte[] message, byte[] key) {
         checkLength(key, Util.SECRET_KEY_LEN);
-        mKey = Arrays.copyOf(key, key.length);
-    }
 
-    public byte[] encrypt(byte[] message) {
         byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
-        return encrypt(nonce, message);
+        return box(nonce, message, key);
     }
 
-    public byte[] encrypt(byte[] nonce, byte[] plaintext) {
+    static byte[] box(byte[] nonce, byte[] plaintext, byte[] key) {
         checkLength(nonce, Util.NONCE_SIZE);
 
         XSalsa20Engine xsalsa20 = new XSalsa20Engine();
         Poly1305 poly1305 = new Poly1305();
 
-        xsalsa20.init(true, new ParametersWithIV(new KeyParameter(mKey), nonce));
+        xsalsa20.init(true, new ParametersWithIV(new KeyParameter(key), nonce));
         byte[] subKey = new byte[Util.SECRET_KEY_LEN];
         xsalsa20.processBytes(subKey, 0, Util.SECRET_KEY_LEN, subKey, 0);
         byte[] cipherWithoutNonce = new byte[plaintext.length + poly1305.getMacSize()];
@@ -46,20 +42,22 @@ public class SecretBox {
         return ciphertext;
     }
 
-    public byte[] decrypt(byte[] ciphertext) {
+    public static byte[] boxOpen(byte[] ciphertext, byte[] key) {
+        checkLength(key, Util.SECRET_KEY_LEN);
+
         byte[] nonce = Arrays.copyOfRange(ciphertext, 0, Util.NONCE_SIZE);
         byte[] message = Arrays.copyOfRange(ciphertext, Util.NONCE_SIZE,
                 ciphertext.length);
-        return decrypt(nonce, message);
+        return boxOpen(nonce, message, key);
     }
 
-    public byte[] decrypt(byte[] nonce, byte[] ciphertext) {
+    static byte[] boxOpen(byte[] nonce, byte[] ciphertext, byte[] key) {
         checkLength(nonce, Util.NONCE_SIZE);
 
         XSalsa20Engine xsalsa20 = new XSalsa20Engine();
         Poly1305 poly1305 = new Poly1305();
 
-        xsalsa20.init(false, new ParametersWithIV(new KeyParameter(mKey), nonce));
+        xsalsa20.init(false, new ParametersWithIV(new KeyParameter(key), nonce));
         byte[] sk = new byte[Util.SECRET_KEY_LEN];
         xsalsa20.processBytes(sk, 0, sk.length, sk, 0);
 
@@ -84,7 +82,7 @@ public class SecretBox {
         return plaintext;
     }
 
-    private void checkLength(byte[] data, int size) {
+    static void checkLength(byte[] data, int size) {
         if (data == null)
             throw new NullPointerException("Input array is null.");
         else if (data.length != size) {
