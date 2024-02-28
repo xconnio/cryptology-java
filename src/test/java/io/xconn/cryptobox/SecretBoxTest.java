@@ -1,5 +1,9 @@
 package io.xconn.cryptobox;
 
+import org.bouncycastle.util.encoders.Hex;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -7,10 +11,6 @@ import static io.xconn.cryptobox.SecretBox.MAC_SIZE;
 import static io.xconn.cryptobox.SecretBox.box;
 import static io.xconn.cryptobox.SecretBox.boxOpen;
 import static io.xconn.cryptobox.SecretBox.checkLength;
-
-import org.bouncycastle.util.encoders.Hex;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 public class SecretBoxTest {
 

@@ -1,12 +1,12 @@
 package io.xconn.cryptobox;
 
+import java.security.MessageDigest;
+import java.util.Arrays;
+
 import org.bouncycastle.crypto.engines.XSalsa20Engine;
 import org.bouncycastle.crypto.macs.Poly1305;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
-
-import java.security.MessageDigest;
-import java.util.Arrays;
 
 public class SecretBox {
 
