@@ -1,76 +1,86 @@
 package io.xconn.cryptology;
 
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static io.xconn.cryptology.Util.MAC_SIZE;
 import static io.xconn.cryptology.SecretBox.box;
 import static io.xconn.cryptology.SecretBox.boxOpen;
 import static io.xconn.cryptology.SecretBox.checkLength;
+import static io.xconn.cryptology.SecretBox.generateSecret;
 
 public class SecretBoxTest {
 
-    private static byte[] privateKey;
+    private static byte[] secretKey;
 
     @BeforeAll
     public static void setUp() {
-        privateKey = Hex.decode("cd281cb85a967c5fc249b31c1c6503a181841526182d4f6e63c81e4213a45fb7");
+        secretKey = generateSecret();
     }
 
     @Test
     public void testEncryptAndDecrypt() {
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = box(message, privateKey);
-        byte[] decrypted = boxOpen(encrypted, privateKey);
+        byte[] encrypted = box(message, secretKey);
+        byte[] decrypted = boxOpen(encrypted, secretKey);
         assertArrayEquals(message, decrypted);
     }
 
     @Test
     public void testEncryptAndDecryptOutput() {
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = new byte[Util.NONCE_SIZE + MAC_SIZE + message.length];
-        box(encrypted, message, privateKey);
+        byte[] encrypted = new byte[SecretBox.NONCE_SIZE + SecretBox.MAC_SIZE + message.length];
+        box(encrypted, message, secretKey);
         byte[] decrypted = new byte[message.length];
-        boxOpen(decrypted, encrypted, privateKey);
+        boxOpen(decrypted, encrypted, secretKey);
         assertArrayEquals(message, decrypted);
     }
 
     @Test
     public void testEncryptAndDecryptWithNonce() {
-        byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
+        byte[] nonce = SecretBox.generateNonce();
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = new byte[message.length + Util.NONCE_SIZE + MAC_SIZE];
-        box(encrypted, nonce, message, privateKey);
-        byte[] decrypted = boxOpen(encrypted, privateKey);
+        byte[] encrypted = new byte[message.length + SecretBox.NONCE_SIZE + SecretBox.MAC_SIZE];
+        box(encrypted, nonce, message, secretKey);
+        byte[] decrypted = boxOpen(encrypted, secretKey);
         assertArrayEquals(message, decrypted);
     }
 
     @Test
     public void testEncryptAndDecryptWithInvalidMAC() {
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = box(message, privateKey);
+        byte[] encrypted = box(message, secretKey);
         encrypted[encrypted.length - 1] ^= 0xFF; // Modify last byte
-        assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, privateKey));
+        assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, secretKey));
     }
 
     @Test
     public void testEncryptAndDecryptWithInvalidNonce() {
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = box(message, privateKey);
+        byte[] encrypted = box(message, secretKey);
         encrypted[0] ^= 0xFF; // Modify first byte
-        assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, privateKey));
+        assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, secretKey));
     }
 
     @Test
     public void testEncryptAndDecryptWithModifiedCiphertext() {
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = box(message, privateKey);
-        encrypted[Util.NONCE_SIZE + 1] ^= 0xFF; // Modify the byte next to nonce
-        assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, privateKey));
+        byte[] encrypted = box(message, secretKey);
+        encrypted[SecretBox.NONCE_SIZE + 1] ^= 0xFF; // Modify the byte next to nonce
+        assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, secretKey));
+    }
+
+    @Test
+    public void testGenerateRandomBytesArray() {
+        int size = 32;
+        byte[] randomBytes = SecretBox.generateRandomBytesArray(size);
+
+        assertNotNull(randomBytes);
+        assertEquals(size, randomBytes.length);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package io.xconn.cryptology;
 
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 import org.bouncycastle.crypto.engines.XSalsa20Engine;
@@ -8,36 +9,38 @@ import org.bouncycastle.crypto.macs.Poly1305;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
-import static io.xconn.cryptology.Util.MAC_SIZE;
-
 public class SecretBox {
 
-    public static byte[] box(byte[] message, byte[] privateKey) {
-        checkLength(privateKey, Util.SECRET_KEY_LEN);
+    public static final int NONCE_SIZE = 24;
+    public static final int SECRET_KEY_LEN = 32;
+    public static final int MAC_SIZE = 16;
 
-        byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
-        byte[] output = new byte[message.length + MAC_SIZE + Util.NONCE_SIZE];
+    public static byte[] box(byte[] message, byte[] privateKey) {
+        checkLength(privateKey, SECRET_KEY_LEN);
+
+        byte[] nonce = generateNonce();
+        byte[] output = new byte[message.length + MAC_SIZE + NONCE_SIZE];
         box(output, nonce, message, privateKey);
 
         return output;
     }
 
     public static void box(byte[] output, byte[] message, byte[] privateKey) {
-        checkLength(privateKey, Util.SECRET_KEY_LEN);
+        checkLength(privateKey, SECRET_KEY_LEN);
 
-        byte[] nonce = Util.generateRandomBytesArray(Util.NONCE_SIZE);
+        byte[] nonce = generateNonce();
         box(output, nonce, message, privateKey);
     }
 
     static void box(byte[] output, byte[] nonce, byte[] plaintext, byte[] privateKey) {
-        checkLength(nonce, Util.NONCE_SIZE);
+        checkLength(nonce, NONCE_SIZE);
 
         XSalsa20Engine cipher = new XSalsa20Engine();
         Poly1305 mac = new Poly1305();
 
         cipher.init(true, new ParametersWithIV(new KeyParameter(privateKey), nonce));
-        byte[] subKey = new byte[Util.SECRET_KEY_LEN];
-        cipher.processBytes(subKey, 0, Util.SECRET_KEY_LEN, subKey, 0);
+        byte[] subKey = new byte[SECRET_KEY_LEN];
+        cipher.processBytes(subKey, 0, SECRET_KEY_LEN, subKey, 0);
         byte[] cipherWithoutNonce = new byte[plaintext.length + mac.getMacSize()];
         cipher.processBytes(plaintext, 0, plaintext.length, cipherWithoutNonce, mac.getMacSize());
 
@@ -52,10 +55,10 @@ public class SecretBox {
 
 
     public static byte[] boxOpen(byte[] ciphertext, byte[] privateKey) {
-        checkLength(privateKey, Util.SECRET_KEY_LEN);
+        checkLength(privateKey, SECRET_KEY_LEN);
 
-        byte[] nonce = Arrays.copyOfRange(ciphertext, 0, Util.NONCE_SIZE);
-        byte[] message = Arrays.copyOfRange(ciphertext, Util.NONCE_SIZE,
+        byte[] nonce = Arrays.copyOfRange(ciphertext, 0, NONCE_SIZE);
+        byte[] message = Arrays.copyOfRange(ciphertext, NONCE_SIZE,
                 ciphertext.length);
         byte[] plainText = new byte[message.length - MAC_SIZE];
         boxOpen(plainText, nonce, message, privateKey);
@@ -64,23 +67,23 @@ public class SecretBox {
     }
 
     public static void boxOpen(byte[] output, byte[] ciphertext, byte[] privateKey) {
-        checkLength(privateKey, Util.SECRET_KEY_LEN);
+        checkLength(privateKey, SECRET_KEY_LEN);
 
-        byte[] nonce = Arrays.copyOfRange(ciphertext, 0, Util.NONCE_SIZE);
-        byte[] message = Arrays.copyOfRange(ciphertext, Util.NONCE_SIZE,
+        byte[] nonce = Arrays.copyOfRange(ciphertext, 0, NONCE_SIZE);
+        byte[] message = Arrays.copyOfRange(ciphertext, NONCE_SIZE,
                 ciphertext.length);
 
         boxOpen(output, nonce, message, privateKey);
     }
 
     static void boxOpen(byte[] output, byte[] nonce, byte[] ciphertext, byte[] privateKey) {
-        checkLength(nonce, Util.NONCE_SIZE);
+        checkLength(nonce, NONCE_SIZE);
 
         XSalsa20Engine cipher = new XSalsa20Engine();
         Poly1305 mac = new Poly1305();
 
         cipher.init(false, new ParametersWithIV(new KeyParameter(privateKey), nonce));
-        byte[] sk = new byte[Util.SECRET_KEY_LEN];
+        byte[] sk = new byte[SECRET_KEY_LEN];
         cipher.processBytes(sk, 0, sk.length, sk, 0);
 
         // hash ciphertext
@@ -101,6 +104,21 @@ public class SecretBox {
 
 
         cipher.processBytes(ciphertext, mac.getMacSize(), output.length, output, 0);
+    }
+
+    public static byte[] generateSecret() {
+        return generateRandomBytesArray(SECRET_KEY_LEN);
+    }
+
+    static byte[] generateNonce() {
+        return generateRandomBytesArray(NONCE_SIZE);
+    }
+
+    static byte[] generateRandomBytesArray(int size) {
+        byte[] randomBytes = new byte[size];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(randomBytes);
+        return randomBytes;
     }
 
     static void checkLength(byte[] data, int size) {

@@ -1,5 +1,7 @@
 package io.xconn.cryptology;
 
+import java.security.SecureRandom;
+
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,8 +15,6 @@ import static io.xconn.cryptology.SealedBox.computeSharedSecret;
 import static io.xconn.cryptology.SealedBox.createNonce;
 import static io.xconn.cryptology.SealedBox.sealOpen;
 import static io.xconn.cryptology.SealedBox.seal;
-import static io.xconn.cryptology.Util.MAC_SIZE;
-import static io.xconn.cryptology.Util.PUBLIC_KEY_BYTES;
 
 public class SealedBoxTest {
 
@@ -40,7 +40,7 @@ public class SealedBoxTest {
     public void testEncryptAndDecryptOutput() {
         String message = "Hello, world!";
 
-        byte[] encrypted = new byte[message.getBytes().length + PUBLIC_KEY_BYTES + MAC_SIZE];
+        byte[] encrypted = new byte[message.getBytes().length + SealedBox.PUBLIC_KEY_BYTES + SealedBox.MAC_SIZE];
         seal(encrypted, message.getBytes(), publicKey);
         byte[] decrypted = new byte[message.length()];
         sealOpen(decrypted, encrypted, privateKey);
@@ -52,7 +52,7 @@ public class SealedBoxTest {
     void testCreateNonce() {
         byte[] nonce = createNonce(new byte[32], new byte[32]);
         assertNotNull(nonce);
-        assertEquals(Util.NONCE_SIZE, nonce.length);
+        assertEquals(SealedBox.NONCE_SIZE, nonce.length);
     }
 
     @Test
@@ -63,6 +63,28 @@ public class SealedBoxTest {
         assertArrayEquals(expectedSharedSecret, sharedSecret);
     }
 
+    @Test
+    void testGetPublicKey() {
+        SecureRandom random = new SecureRandom();
+        byte[] privateKeyRaw = new byte[32];
+        random.nextBytes(privateKeyRaw);
+
+        byte[] publicKey = SealedBox.getPublicKey(privateKeyRaw);
+
+        assertNotNull(publicKey);
+        assertEquals(SealedBox.PUBLIC_KEY_BYTES, publicKey.length);
+    }
+
+    @Test
+    void testGenerateKeyPair() {
+        KeyPair keyPair = SealedBox.generateKeyPair();
+
+        assertNotNull(keyPair);
+        assertNotNull(keyPair.getPublicKey());
+        assertNotNull(keyPair.getPrivateKey());
+        assertEquals(SealedBox.PUBLIC_KEY_BYTES, keyPair.getPublicKey().length);
+        assertEquals(SealedBox.PRIVATE_KEY_BYTES, keyPair.getPrivateKey().length);
+    }
 
     @Test
     public void testInvalidDecrypt() {
