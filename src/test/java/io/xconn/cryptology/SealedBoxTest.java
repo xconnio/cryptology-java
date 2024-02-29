@@ -40,7 +40,7 @@ public class SealedBoxTest {
     public void testEncryptAndDecryptOutput() {
         String message = "Hello, world!";
 
-        byte[] encrypted = new byte[message.getBytes().length + SealedBox.PUBLIC_KEY_BYTES + SealedBox.MAC_SIZE];
+        byte[] encrypted = new byte[message.getBytes().length + SealedBox.PUBLIC_KEY_BYTES + Util.MAC_SIZE];
         seal(encrypted, message.getBytes(), publicKey);
         byte[] decrypted = new byte[message.length()];
         sealOpen(decrypted, encrypted, privateKey);
@@ -52,7 +52,7 @@ public class SealedBoxTest {
     void testCreateNonce() {
         byte[] nonce = createNonce(new byte[32], new byte[32]);
         assertNotNull(nonce);
-        assertEquals(SealedBox.NONCE_SIZE, nonce.length);
+        assertEquals(Util.NONCE_SIZE, nonce.length);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class SealedBoxTest {
         assertNotNull(keyPair.getPublicKey());
         assertNotNull(keyPair.getPrivateKey());
         assertEquals(SealedBox.PUBLIC_KEY_BYTES, keyPair.getPublicKey().length);
-        assertEquals(SealedBox.PRIVATE_KEY_BYTES, keyPair.getPrivateKey().length);
+        assertEquals(Util.SECRET_KEY_LEN, keyPair.getPrivateKey().length);
     }
 
     @Test

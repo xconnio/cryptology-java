@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static io.xconn.cryptology.SecretBox.box;
 import static io.xconn.cryptology.SecretBox.boxOpen;
-import static io.xconn.cryptology.SecretBox.checkLength;
 import static io.xconn.cryptology.SecretBox.generateSecret;
 
 public class SecretBoxTest {
@@ -33,20 +32,10 @@ public class SecretBoxTest {
     @Test
     public void testEncryptAndDecryptOutput() {
         byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = new byte[SecretBox.NONCE_SIZE + SecretBox.MAC_SIZE + message.length];
+        byte[] encrypted = new byte[Util.NONCE_SIZE + Util.MAC_SIZE + message.length];
         box(encrypted, message, secretKey);
         byte[] decrypted = new byte[message.length];
         boxOpen(decrypted, encrypted, secretKey);
-        assertArrayEquals(message, decrypted);
-    }
-
-    @Test
-    public void testEncryptAndDecryptWithNonce() {
-        byte[] nonce = SecretBox.generateNonce();
-        byte[] message = "Hello, World!".getBytes();
-        byte[] encrypted = new byte[message.length + SecretBox.NONCE_SIZE + SecretBox.MAC_SIZE];
-        box(encrypted, nonce, message, secretKey);
-        byte[] decrypted = boxOpen(encrypted, secretKey);
         assertArrayEquals(message, decrypted);
     }
 
@@ -70,7 +59,7 @@ public class SecretBoxTest {
     public void testEncryptAndDecryptWithModifiedCiphertext() {
         byte[] message = "Hello, World!".getBytes();
         byte[] encrypted = box(message, secretKey);
-        encrypted[SecretBox.NONCE_SIZE + 1] ^= 0xFF; // Modify the byte next to nonce
+        encrypted[Util.NONCE_SIZE + 1] ^= 0xFF; // Modify the byte next to nonce
         assertThrows(IllegalArgumentException.class, () -> boxOpen(encrypted, secretKey));
     }
 
@@ -81,15 +70,5 @@ public class SecretBoxTest {
 
         assertNotNull(randomBytes);
         assertEquals(size, randomBytes.length);
-    }
-
-    @Test
-    void testCheckLength() {
-        assertThrows(NullPointerException.class, () -> checkLength(null, 16));
-
-        byte[] data = new byte[16];
-        checkLength(data, 16);
-
-        assertThrows(IllegalArgumentException.class, () -> checkLength(data, 32));
     }
 }

@@ -36,8 +36,8 @@ public class InteroperabilityTest {
         // encrypt using SecretBox
         byte[] cipherText = SecretBox.box(message, privateKey);
 
-        byte[] nonce1 = Arrays.copyOfRange(cipherText, 0, SecretBox.NONCE_SIZE);
-        byte[] encryptedMessage = Arrays.copyOfRange(cipherText, SecretBox.NONCE_SIZE, cipherText.length);
+        byte[] nonce1 = Arrays.copyOfRange(cipherText, 0, Util.NONCE_SIZE);
+        byte[] encryptedMessage = Arrays.copyOfRange(cipherText, Util.NONCE_SIZE, cipherText.length);
 
         // decrypt using TweetNaCl
         byte[] decryptedMessage = box.open(encryptedMessage, nonce1);
@@ -89,7 +89,7 @@ public class InteroperabilityTest {
         }
 
         public static byte[] crypto_box_seal_open(byte[] c, byte[] pk, byte[] sk) throws GeneralSecurityException {
-            if (c.length < SealedBox.PUBLIC_KEY_BYTES + SealedBox.MAC_SIZE)
+            if (c.length < SealedBox.PUBLIC_KEY_BYTES + Util.MAC_SIZE)
                 throw new IllegalArgumentException("Ciphertext too short");
 
             byte[] pksender = Arrays.copyOfRange(c, 0, SealedBox.PUBLIC_KEY_BYTES);

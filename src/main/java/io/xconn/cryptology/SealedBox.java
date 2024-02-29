@@ -4,23 +4,19 @@ import java.security.SecureRandom;
 
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.digests.Blake2bDigest;
-import org.bouncycastle.crypto.engines.XSalsa20Engine;
 import org.bouncycastle.crypto.generators.X25519KeyPairGenerator;
-import org.bouncycastle.crypto.macs.Poly1305;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.crypto.params.X25519KeyGenerationParameters;
 import org.bouncycastle.crypto.params.X25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.X25519PublicKeyParameters;
 import org.bouncycastle.math.ec.rfc7748.X25519;
 import org.bouncycastle.util.Arrays;
 
+import static io.xconn.cryptology.Util.MAC_SIZE;
+import static io.xconn.cryptology.Util.NONCE_SIZE;
+
 public class SealedBox {
     private static final byte[] HSALSA20_SEED = new byte[16];
-    public static final int NONCE_SIZE = 24;
     public static final int PUBLIC_KEY_BYTES = 32;
-    public static final int PRIVATE_KEY_BYTES = 32;
-    public static final int MAC_SIZE = 16;
 
     public static byte[] seal(byte[] message, byte[] recipientPublicKey) {
         byte[] cipherText = new byte[message.length + PUBLIC_KEY_BYTES + MAC_SIZE];
@@ -33,27 +29,10 @@ public class SealedBox {
         byte[] nonce = createNonce(keyPair.getPublicKey(), recipientPublicKey);
         byte[] sharedSecret = computeSharedSecret(recipientPublicKey, keyPair.getPrivateKey());
 
-        XSalsa20Engine cipher = new XSalsa20Engine();
-        ParametersWithIV params = new ParametersWithIV(new KeyParameter(sharedSecret), nonce);
-        cipher.init(true, params);
-
-        byte[] sk = new byte[PRIVATE_KEY_BYTES];
-        cipher.processBytes(sk, 0, sk.length, sk, 0);
-
-        // encrypt the message
-        byte[] ciphertext = new byte[message.length];
-        cipher.processBytes(message, 0, message.length, ciphertext, 0);
-
-        // create the MAC
-        Poly1305 mac = new Poly1305();
-        byte[] macBuf = new byte[mac.getMacSize()];
-        mac.init(new KeyParameter(sk));
-        mac.update(ciphertext, 0, ciphertext.length);
-        mac.doFinal(macBuf, 0);
+        byte[] ciphertext = Util.encrypt(nonce, message, sharedSecret);
 
         System.arraycopy(keyPair.getPublicKey(), 0, output, 0, keyPair.getPublicKey().length);
-        System.arraycopy(macBuf, 0, output, keyPair.getPublicKey().length, macBuf.length);
-        System.arraycopy(ciphertext, 0, output, keyPair.getPublicKey().length + macBuf.length, ciphertext.length);
+        System.arraycopy(ciphertext, 0, output, keyPair.getPublicKey().length, ciphertext.length);
     }
 
     public static KeyPair generateKeyPair() {
@@ -110,6 +89,6 @@ public class SealedBox {
         byte[] nonce = createNonce(ephemeralPublicKey, getPublicKey(privateKey));
         byte[] sharedSecret = computeSharedSecret(ephemeralPublicKey, privateKey);
 
-        SecretBox.boxOpen(output, nonce, ciphertext, sharedSecret);
+        Util.decrypt(output, nonce, ciphertext, sharedSecret);
     }
 }
