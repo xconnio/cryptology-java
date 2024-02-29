@@ -1,4 +1,4 @@
-package io.xconn.cryptobox;
+package io.xconn.cryptology;
 
 public class KeyPair {
     private final byte[] publicKey;

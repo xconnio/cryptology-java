@@ -1,4 +1,4 @@
-package io.xconn.cryptobox;
+package io.xconn.cryptology;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import org.bouncycastle.crypto.macs.Poly1305;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
-import static io.xconn.cryptobox.Util.MAC_SIZE;
+import static io.xconn.cryptology.Util.MAC_SIZE;
 
 public class SecretBox {
 

@@ -1,4 +1,4 @@
-package io.xconn.cryptobox;
+package io.xconn.cryptology;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package io.xconn.cryptobox;
+package io.xconn.cryptology;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeAll;
@@ -7,10 +7,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static io.xconn.cryptobox.Util.MAC_SIZE;
-import static io.xconn.cryptobox.SecretBox.box;
-import static io.xconn.cryptobox.SecretBox.boxOpen;
-import static io.xconn.cryptobox.SecretBox.checkLength;
+import static io.xconn.cryptology.Util.MAC_SIZE;
+import static io.xconn.cryptology.SecretBox.box;
+import static io.xconn.cryptology.SecretBox.boxOpen;
+import static io.xconn.cryptology.SecretBox.checkLength;
 
 public class SecretBoxTest {
 
