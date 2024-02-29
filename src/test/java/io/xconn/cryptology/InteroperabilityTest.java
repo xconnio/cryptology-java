@@ -1,4 +1,4 @@
-package io.xconn.cryptobox;
+package io.xconn.cryptology;
 
 import java.security.GeneralSecurityException;
 import java.util.Arrays;

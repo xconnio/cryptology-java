@@ -1,4 +1,4 @@
-package io.xconn.cryptobox;
+package io.xconn.cryptology;
 
 import java.security.SecureRandom;
 
@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import static io.xconn.cryptobox.Util.PUBLIC_KEY_BYTES;
-import static io.xconn.cryptobox.Util.generateX25519KeyPair;
-import static io.xconn.cryptobox.Util.getX25519PublicKey;
+import static io.xconn.cryptology.Util.PUBLIC_KEY_BYTES;
+import static io.xconn.cryptology.Util.generateX25519KeyPair;
+import static io.xconn.cryptology.Util.getX25519PublicKey;
 
 
 public class UtilTest {

@@ -1,4 +1,4 @@
-package io.xconn.cryptobox;
+package io.xconn.cryptology;
 
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeAll;
@@ -9,12 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import static io.xconn.cryptobox.SealedBox.computeSharedSecret;
-import static io.xconn.cryptobox.SealedBox.createNonce;
-import static io.xconn.cryptobox.SealedBox.sealOpen;
-import static io.xconn.cryptobox.SealedBox.seal;
-import static io.xconn.cryptobox.Util.MAC_SIZE;
-import static io.xconn.cryptobox.Util.PUBLIC_KEY_BYTES;
+import static io.xconn.cryptology.SealedBox.computeSharedSecret;
+import static io.xconn.cryptology.SealedBox.createNonce;
+import static io.xconn.cryptology.SealedBox.sealOpen;
+import static io.xconn.cryptology.SealedBox.seal;
+import static io.xconn.cryptology.Util.MAC_SIZE;
+import static io.xconn.cryptology.Util.PUBLIC_KEY_BYTES;
 
 public class SealedBoxTest {
 

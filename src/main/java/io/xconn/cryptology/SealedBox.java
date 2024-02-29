@@ -1,4 +1,4 @@
-package io.xconn.cryptobox;
+package io.xconn.cryptology;
 
 import org.bouncycastle.crypto.digests.Blake2bDigest;
 import org.bouncycastle.crypto.engines.XSalsa20Engine;
@@ -8,9 +8,9 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.math.ec.rfc7748.X25519;
 import org.bouncycastle.util.Arrays;
 
-import static io.xconn.cryptobox.Util.MAC_SIZE;
-import static io.xconn.cryptobox.Util.PUBLIC_KEY_BYTES;
-import static io.xconn.cryptobox.Util.getX25519PublicKey;
+import static io.xconn.cryptology.Util.MAC_SIZE;
+import static io.xconn.cryptology.Util.PUBLIC_KEY_BYTES;
+import static io.xconn.cryptology.Util.getX25519PublicKey;
 
 public class SealedBox {
     private static final byte[] HSALSA20_SEED = new byte[16];
