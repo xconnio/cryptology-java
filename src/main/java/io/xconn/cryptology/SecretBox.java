@@ -26,19 +26,15 @@ public class SecretBox {
 
 
     public static byte[] boxOpen(byte[] ciphertext, byte[] privateKey) {
-        byte[] nonce = Arrays.copyOfRange(ciphertext, 0, NONCE_SIZE);
-        byte[] message = Arrays.copyOfRange(ciphertext, NONCE_SIZE,
-                ciphertext.length);
-        byte[] plainText = new byte[message.length - MAC_SIZE];
-        Util.decrypt(plainText, nonce, message, privateKey);
+        byte[] plainText = new byte[ciphertext.length - MAC_SIZE - NONCE_SIZE];
+        boxOpen(plainText, ciphertext, privateKey);
 
         return plainText;
     }
 
     public static void boxOpen(byte[] output, byte[] ciphertext, byte[] privateKey) {
         byte[] nonce = Arrays.copyOfRange(ciphertext, 0, NONCE_SIZE);
-        byte[] message = Arrays.copyOfRange(ciphertext, NONCE_SIZE,
-                ciphertext.length);
+        byte[] message = Arrays.copyOfRange(ciphertext, NONCE_SIZE, ciphertext.length);
 
         Util.decrypt(output, nonce, message, privateKey);
     }
