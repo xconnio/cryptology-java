@@ -10,7 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static io.xconn.cryptology.SecretBox.box;
 import static io.xconn.cryptology.SecretBox.boxOpen;
+import static io.xconn.cryptology.SecretBox.extractNonce;
 import static io.xconn.cryptology.SecretBox.generateSecret;
+import static io.xconn.cryptology.SecretBox.prependNonce;
 
 public class SecretBoxTest {
 
@@ -73,6 +75,25 @@ public class SecretBoxTest {
         encrypted[Util.NONCE_SIZE + 1] ^= 0xFF; // Modify the byte next to nonce
         assertThrows(IllegalArgumentException.class, () -> boxOpen(nonce, encrypted, secretKey));
     }
+
+
+    @Test
+    public void testPrependNonceAndExtractNonce() {
+        byte[] nonce = new byte[]{1, 2, 3, 4, 5};
+        byte[] cipherWithoutNonce = new byte[]{6, 7, 8, 9};
+        byte[] cipherWithNonce = new byte[nonce.length + cipherWithoutNonce.length];
+        prependNonce(cipherWithNonce, nonce, cipherWithoutNonce);
+
+        assertArrayEquals(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, cipherWithNonce);
+
+        byte[] extractedNonce = new byte[nonce.length];
+        byte[] extractedCipher = new byte[cipherWithoutNonce.length];
+        extractNonce(extractedNonce, extractedCipher, cipherWithNonce);
+
+        assertArrayEquals(nonce, extractedNonce);
+        assertArrayEquals(cipherWithoutNonce, extractedCipher);
+    }
+
 
     @Test
     public void testGenerateRandomBytesArray() {
