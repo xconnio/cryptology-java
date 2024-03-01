@@ -1,6 +1,7 @@
 package io.xconn.cryptology;
 
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 
 import org.bouncycastle.crypto.engines.XSalsa20Engine;
 import org.bouncycastle.crypto.macs.Poly1305;
@@ -61,12 +62,19 @@ public class Util {
         cipher.processBytes(ciphertext, mac.getMacSize(), output.length, output, 0);
     }
 
-    static void checkLength(byte[] data, int size) {
+    public static void checkLength(byte[] data, int size) {
         if (data == null)
             throw new NullPointerException("Input array is null.");
         else if (data.length != size) {
             throw new IllegalArgumentException("Invalid array length: " + data.length +
                     ". Length should be " + size);
         }
+    }
+
+    public static byte[] generateRandomBytesArray(int size) {
+        byte[] randomBytes = new byte[size];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(randomBytes);
+        return randomBytes;
     }
 }

@@ -4,6 +4,8 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static io.xconn.cryptology.Util.checkLength;
@@ -35,5 +37,14 @@ public class UtilTest {
         decrypt(decryptedText, nonce, encryptedText, secretKey);
 
         assertArrayEquals(message, decryptedText);
+    }
+
+    @Test
+    public void testGenerateRandomBytesArray() {
+        int size = 32;
+        byte[] randomBytes = Util.generateRandomBytesArray(size);
+
+        assertNotNull(randomBytes);
+        assertEquals(size, randomBytes.length);
     }
 }

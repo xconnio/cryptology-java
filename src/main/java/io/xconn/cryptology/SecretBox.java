@@ -42,17 +42,10 @@ public class SecretBox {
     }
 
     public static byte[] generateSecret() {
-        return generateRandomBytesArray(SECRET_KEY_LEN);
+        return Util.generateRandomBytesArray(SECRET_KEY_LEN);
     }
 
     public static byte[] generateNonce() {
-        return generateRandomBytesArray(NONCE_SIZE);
-    }
-
-    static byte[] generateRandomBytesArray(int size) {
-        byte[] randomBytes = new byte[size];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(randomBytes);
-        return randomBytes;
+        return Util.generateRandomBytesArray(NONCE_SIZE);
     }
 }

@@ -93,14 +93,4 @@ public class SecretBoxTest {
         assertArrayEquals(nonce, extractedNonce);
         assertArrayEquals(cipherWithoutNonce, extractedCipher);
     }
-
-
-    @Test
-    public void testGenerateRandomBytesArray() {
-        int size = 32;
-        byte[] randomBytes = SecretBox.generateRandomBytesArray(size);
-
-        assertNotNull(randomBytes);
-        assertEquals(size, randomBytes.length);
-    }
 }
