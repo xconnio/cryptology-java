@@ -12,7 +12,7 @@ public class Util {
     public static final int NONCE_SIZE = 24;
     public static final int MAC_SIZE = 16;
 
-    public static byte[] encrypt(byte[] nonce, byte[] message, byte[] secret) {
+    public static void encrypt(byte[] output, byte[] nonce, byte[] message, byte[] secret) {
         checkLength(secret, SECRET_KEY_LEN);
         checkLength(nonce, NONCE_SIZE);
 
@@ -22,15 +22,12 @@ public class Util {
         cipher.init(true, new ParametersWithIV(new KeyParameter(secret), nonce));
         byte[] subKey = new byte[SECRET_KEY_LEN];
         cipher.processBytes(subKey, 0, SECRET_KEY_LEN, subKey, 0);
-        byte[] cipherText = new byte[message.length + mac.getMacSize()];
-        cipher.processBytes(message, 0, message.length, cipherText, mac.getMacSize());
+        cipher.processBytes(message, 0, message.length, output, mac.getMacSize());
 
         // hash the ciphertext
         mac.init(new KeyParameter(subKey));
-        mac.update(cipherText, mac.getMacSize(), message.length);
-        mac.doFinal(cipherText, 0);
-
-        return cipherText;
+        mac.update(output, mac.getMacSize(), message.length);
+        mac.doFinal(output, 0);
     }
 
     static void decrypt(byte[] output, byte[] nonce, byte[] ciphertext, byte[] secret) {

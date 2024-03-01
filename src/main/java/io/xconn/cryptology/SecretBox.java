@@ -1,7 +1,6 @@
 package io.xconn.cryptology;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 import static io.xconn.cryptology.Util.MAC_SIZE;
 import static io.xconn.cryptology.Util.NONCE_SIZE;
@@ -9,41 +8,34 @@ import static io.xconn.cryptology.Util.SECRET_KEY_LEN;
 
 public class SecretBox {
 
-    public static byte[] box(byte[] message, byte[] privateKey) {
-        byte[] output = new byte[message.length + MAC_SIZE + NONCE_SIZE];
-        box(output, message, privateKey);
+    public static byte[] box(byte[] nonce, byte[] message, byte[] privateKey) {
+        byte[] output = new byte[message.length + MAC_SIZE];
+        box(output, nonce, message, privateKey);
 
         return output;
     }
 
-    public static void box(byte[] output, byte[] message, byte[] privateKey) {
-        byte[] nonce = generateNonce();
-        byte[] cipherWithoutNonce = Util.encrypt(nonce, message, privateKey);
-
-        System.arraycopy(nonce, 0, output, 0, nonce.length);
-        System.arraycopy(cipherWithoutNonce, 0, output, nonce.length, cipherWithoutNonce.length);
+    public static void box(byte[] output, byte[] nonce, byte[] message, byte[] privateKey) {
+        Util.encrypt(output, nonce, message, privateKey);
     }
 
 
-    public static byte[] boxOpen(byte[] ciphertext, byte[] privateKey) {
-        byte[] plainText = new byte[ciphertext.length - MAC_SIZE - NONCE_SIZE];
-        boxOpen(plainText, ciphertext, privateKey);
+    public static byte[] boxOpen(byte[] nonce, byte[] ciphertext, byte[] privateKey) {
+        byte[] plainText = new byte[ciphertext.length - MAC_SIZE];
+        boxOpen(plainText, nonce, ciphertext, privateKey);
 
         return plainText;
     }
 
-    public static void boxOpen(byte[] output, byte[] ciphertext, byte[] privateKey) {
-        byte[] nonce = Arrays.copyOfRange(ciphertext, 0, NONCE_SIZE);
-        byte[] message = Arrays.copyOfRange(ciphertext, NONCE_SIZE, ciphertext.length);
-
-        Util.decrypt(output, nonce, message, privateKey);
+    public static void boxOpen(byte[] output, byte[] nonce, byte[] ciphertext, byte[] privateKey) {
+        Util.decrypt(output, nonce, ciphertext, privateKey);
     }
 
     public static byte[] generateSecret() {
         return generateRandomBytesArray(SECRET_KEY_LEN);
     }
 
-    static byte[] generateNonce() {
+    public static byte[] generateNonce() {
         return generateRandomBytesArray(NONCE_SIZE);
     }
 

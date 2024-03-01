@@ -28,7 +28,8 @@ public class UtilTest {
         byte[] message = "Hello, world!".getBytes();
         byte[] nonce = SecretBox.generateNonce();
 
-        byte[] encryptedText = encrypt(nonce, message, secretKey);
+        byte[] encryptedText = new byte[message.length + Util.MAC_SIZE];
+        encrypt(encryptedText, nonce, message, secretKey);
 
         byte[] decryptedText = new byte[message.length];
         decrypt(decryptedText, nonce, encryptedText, secretKey);
