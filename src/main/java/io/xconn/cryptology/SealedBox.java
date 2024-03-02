@@ -29,7 +29,8 @@ public class SealedBox {
         byte[] nonce = createNonce(keyPair.getPublicKey(), recipientPublicKey);
         byte[] sharedSecret = computeSharedSecret(recipientPublicKey, keyPair.getPrivateKey());
 
-        byte[] ciphertext = Util.encrypt(nonce, message, sharedSecret);
+        byte[] ciphertext = new byte[message.length + MAC_SIZE];
+        Util.encrypt(ciphertext, nonce, message, sharedSecret);
 
         System.arraycopy(keyPair.getPublicKey(), 0, output, 0, keyPair.getPublicKey().length);
         System.arraycopy(ciphertext, 0, output, keyPair.getPublicKey().length, ciphertext.length);

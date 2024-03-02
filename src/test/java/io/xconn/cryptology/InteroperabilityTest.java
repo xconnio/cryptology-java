@@ -24,23 +24,17 @@ public class InteroperabilityTest {
         TweetNaclFast.SecretBox box = new TweetNaclFast.SecretBox(privateKey);
         byte[] ct = box.box(message, nonce);
 
-        byte[] ciphertext = new byte[nonce.length + ct.length];
-        System.arraycopy(nonce, 0, ciphertext, 0, nonce.length);
-        System.arraycopy(ct, 0, ciphertext, nonce.length, ct.length);
-
         //  decrypt using SecretBox
-        byte[] plainText = SecretBox.boxOpen(ciphertext, privateKey);
+        byte[] plainText = SecretBox.boxOpen(nonce, ct, privateKey);
 
         assertArrayEquals(message, plainText);
 
         // encrypt using SecretBox
-        byte[] cipherText = SecretBox.box(message, privateKey);
-
-        byte[] nonce1 = Arrays.copyOfRange(cipherText, 0, Util.NONCE_SIZE);
-        byte[] encryptedMessage = Arrays.copyOfRange(cipherText, Util.NONCE_SIZE, cipherText.length);
+        byte[] cipherText = SecretBox.box(nonce, message, privateKey);
 
         // decrypt using TweetNaCl
-        byte[] decryptedMessage = box.open(encryptedMessage, nonce1);
+        byte[] decryptedMessage = box.open(cipherText, nonce);
+
         assertArrayEquals(message, decryptedMessage);
     }
 
