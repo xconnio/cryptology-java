@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'maven-publish'
+    id 'signing'
 }
 
 group = 'io.xconn'
@@ -24,6 +25,10 @@ publishing {
                 password = project.findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
             }
         }
+    }
+    signing {
+        required true
+        sign publishing.publications
     }
 }
 
