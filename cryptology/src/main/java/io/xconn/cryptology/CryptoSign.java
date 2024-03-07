@@ -28,7 +28,7 @@ public class CryptoSign {
     }
 
     /**
-     * Derives the publicKey from the given privateKey bytes.
+     * Derives the publicKey from the given privateKey.
      *
      * @param privateKey privateKey bytes.
      * @return publicKey bytes.
@@ -41,7 +41,7 @@ public class CryptoSign {
 
 
     /**
-     * Signs the given challenge using the privateKey bytes.
+     * Signs the given challenge using the privateKey.
      *
      * @param privateKey privateKey bytes.
      * @param challenge  challenge bytes to sign.

@@ -70,7 +70,7 @@ public class SealedBox {
     }
 
     /**
-     * Derives the publicKey from the given privateKey bytes.
+     * Derives the publicKey from the given privateKey.
      *
      * @param privateKeyRaw privateKey bytes.
      * @return publicKey bytes.
