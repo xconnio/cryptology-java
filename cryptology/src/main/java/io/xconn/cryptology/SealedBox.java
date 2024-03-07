@@ -18,12 +18,26 @@ public class SealedBox {
     private static final byte[] HSALSA20_SEED = new byte[16];
     public static final int PUBLIC_KEY_BYTES = 32;
 
+    /**
+     * Seals a message using recipient's publicKey.
+     *
+     * @param message            message to seal.
+     * @param recipientPublicKey recipient's publicKey.
+     * @return sealed message.
+     */
     public static byte[] seal(byte[] message, byte[] recipientPublicKey) {
         byte[] cipherText = new byte[message.length + PUBLIC_KEY_BYTES + MAC_SIZE];
         seal(cipherText, message, recipientPublicKey);
         return cipherText;
     }
 
+    /**
+     * Seals a message using recipient's publicKey and writes the result to the given output array.
+     *
+     * @param output             output array to write the sealed message.
+     * @param message            message to seal.
+     * @param recipientPublicKey recipient's publicKey.
+     */
     public static void seal(byte[] output, byte[] message, byte[] recipientPublicKey) {
         KeyPair keyPair = generateKeyPair();
         byte[] nonce = createNonce(keyPair.getPublicKey(), recipientPublicKey);
@@ -36,6 +50,11 @@ public class SealedBox {
         System.arraycopy(ciphertext, 0, output, keyPair.getPublicKey().length, ciphertext.length);
     }
 
+    /**
+     * Generates a new X25519 keypair.
+     *
+     * @return KeyPair object containing the public and private key bytes.
+     */
     public static KeyPair generateKeyPair() {
         SecureRandom random = new SecureRandom();
         X25519KeyGenerationParameters params = new X25519KeyGenerationParameters(random);
@@ -50,6 +69,12 @@ public class SealedBox {
         return new KeyPair(publicKeyParams.getEncoded(), privateKeyParams.getEncoded());
     }
 
+    /**
+     * Derives the publicKey from the given privateKey bytes.
+     *
+     * @param privateKeyRaw privateKey bytes.
+     * @return publicKey bytes.
+     */
     public static byte[] getPublicKey(byte[] privateKeyRaw) {
         X25519PrivateKeyParameters privateKey = new X25519PrivateKeyParameters(privateKeyRaw, 0);
 
@@ -78,12 +103,26 @@ public class SealedBox {
         return key;
     }
 
+    /**
+     * Opens a sealed message using the recipient's privateKey.
+     *
+     * @param message    sealed message to open.
+     * @param privateKey recipient's privateKey.
+     * @return opened message.
+     */
     public static byte[] sealOpen(byte[] message, byte[] privateKey) {
         byte[] plainText = new byte[message.length - PUBLIC_KEY_BYTES - MAC_SIZE];
         sealOpen(plainText, message, privateKey);
         return plainText;
     }
 
+    /**
+     * Opens a sealed message using the recipient's privateKey, and writes the result to the given output array.
+     *
+     * @param output     output array to write the opened message.
+     * @param message    sealed message to open.
+     * @param privateKey recipient's privateKey.
+     */
     public static void sealOpen(byte[] output, byte[] message, byte[] privateKey) {
         byte[] ephemeralPublicKey = Arrays.copyOf(message, PUBLIC_KEY_BYTES);
         byte[] ciphertext = Arrays.copyOfRange(message, PUBLIC_KEY_BYTES, message.length);
