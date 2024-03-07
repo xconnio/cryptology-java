@@ -3,6 +3,7 @@ plugins {
 }
 
 group = 'io.xconn'
+version = project.findProperty("VERSION") ?: System.getenv("VERSION")
 
 repositories {
     mavenCentral()
