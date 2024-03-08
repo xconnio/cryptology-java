@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+}
+
+group = 'io.xconn'
+version = project.findProperty("VERSION") ?: System.getenv("VERSION")
+
+repositories {
+    mavenCentral()
+}
+
+tasks.register('sourcesJar', Jar) {
+    archiveClassifier.set("sources")
+    from sourceSets.main.java.srcDirs
+}
+
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveClassifier.set("javadoc")
+    from javadoc.destinationDir
+}
+
+dependencies {
+    implementation 'org.bouncycastle:bcprov-jdk18on:1.77'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.purejava:tweetnacl-java:1.1.2'
+}
+
+test {
+    useJUnitPlatform()
+}

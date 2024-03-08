@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+group = 'io.xconn.cryptology.example'
+version = project.findProperty("VERSION") ?: System.getenv("VERSION")
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':cryptology')
+}
