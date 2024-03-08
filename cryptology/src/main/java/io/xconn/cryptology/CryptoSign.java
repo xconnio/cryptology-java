@@ -10,6 +10,11 @@ import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.crypto.signers.Ed25519Signer;
 
 public class CryptoSign {
+    /**
+     * Generates a new Ed25519 keypair.
+     *
+     * @return KeyPair object containing the public and private key bytes.
+     */
     public static KeyPair generateKeyPair() {
         Ed25519KeyPairGenerator keyPairGenerator = new Ed25519KeyPairGenerator();
         keyPairGenerator.init(new Ed25519KeyGenerationParameters(new SecureRandom()));
@@ -22,6 +27,12 @@ public class CryptoSign {
         return new KeyPair(publicKey.getEncoded(), privateKey.getEncoded());
     }
 
+    /**
+     * Derives the publicKey from the given privateKey.
+     *
+     * @param privateKey privateKey bytes.
+     * @return publicKey bytes.
+     */
     public static byte[] getPublicKey(byte[] privateKey) {
         Ed25519PrivateKeyParameters privateKeyParam = new Ed25519PrivateKeyParameters(privateKey, 0);
 
@@ -29,6 +40,13 @@ public class CryptoSign {
     }
 
 
+    /**
+     * Signs the given challenge using the privateKey.
+     *
+     * @param privateKey privateKey bytes.
+     * @param challenge  challenge bytes to sign.
+     * @return signature bytes.
+     */
     public static byte[] sign(byte[] privateKey, byte[] challenge) {
         Ed25519PrivateKeyParameters privateKeyParam = new Ed25519PrivateKeyParameters(privateKey, 0);
 

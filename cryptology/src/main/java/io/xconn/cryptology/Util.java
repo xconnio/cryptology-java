@@ -13,7 +13,7 @@ public class Util {
     public static final int NONCE_SIZE = 24;
     public static final int MAC_SIZE = 16;
 
-    public static void encrypt(byte[] output, byte[] nonce, byte[] message, byte[] secret) {
+    static void encrypt(byte[] output, byte[] nonce, byte[] message, byte[] secret) {
         checkLength(secret, SECRET_KEY_LEN);
         checkLength(nonce, NONCE_SIZE);
 
@@ -62,6 +62,12 @@ public class Util {
         cipher.processBytes(ciphertext, mac.getMacSize(), output.length, output, 0);
     }
 
+    /**
+     * Checks if the length of the given array matches the expected size.
+     *
+     * @param data array to check.
+     * @param size expected size of the array.
+     */
     public static void checkLength(byte[] data, int size) {
         if (data == null)
             throw new NullPointerException("Input array is null.");
@@ -71,6 +77,12 @@ public class Util {
         }
     }
 
+    /**
+     * Generates a byte array of the specified size filled with random bytes.
+     *
+     * @param size size of the byte array to generate.
+     * @return byte array filled with random bytes.
+     */
     public static byte[] generateRandomBytesArray(int size) {
         byte[] randomBytes = new byte[size];
         SecureRandom random = new SecureRandom();
