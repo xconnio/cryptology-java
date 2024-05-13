@@ -56,4 +56,22 @@ public class CryptoSign {
 
         return signer.generateSignature();
     }
+
+    /**
+     * Verifies the signature of the given challenge using the publicKey.
+     *
+     * @param publicKey publicKey bytes.
+     * @param challenge challenge bytes.
+     * @param signature signature bytes to verify.
+     * @return true if the signature is valid, false otherwise.
+     */
+    public static boolean verify(byte[] publicKey, byte[] challenge, byte[] signature) {
+        Ed25519PublicKeyParameters publicKeyParam = new Ed25519PublicKeyParameters(publicKey, 0);
+
+        Ed25519Signer verifier = new Ed25519Signer();
+        verifier.init(false, publicKeyParam);
+        verifier.update(challenge, 0, challenge.length);
+
+        return verifier.verifySignature(signature);
+    }
 }
