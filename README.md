@@ -10,14 +10,14 @@ Include in your project using Maven:
 <dependency>
     <groupId>io.xconn</groupId>
     <artifactId>cryptology</artifactId>
-    <version>0.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 
 Or with Gradle:
 
 ```groovy
-implementation 'io.xconn:cryptology:0.1.0'
+implementation 'io.xconn:cryptology:1.1.1'
 ```
 
 ## Usage
