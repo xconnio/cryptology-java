@@ -9,6 +9,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class InteroperabilityTest {
 
@@ -17,6 +18,9 @@ public class InteroperabilityTest {
 
     @Test
     public void secretBoxTest() {
+        // tweetnacl is broken on java 8, lets skip the test if Java version is not 9 at least.
+        assumeTrue(isJava9OrLater());
+
         byte[] message = "Hello, World!".getBytes();
         byte[] nonce = SecretBox.generateNonce();
 
@@ -40,6 +44,9 @@ public class InteroperabilityTest {
 
     @Test
     public void sealedBoxTest() throws GeneralSecurityException {
+        // tweetnacl is broken on java 8, lets skip the test if Java version is not 9 at least.
+        assumeTrue(isJava9OrLater());
+
         byte[] message = "Hello, World!".getBytes();
 
         // encrypt using TweetNaCl
@@ -57,6 +64,12 @@ public class InteroperabilityTest {
         byte[] plaintext = SealedBoxNaCl.crypto_box_seal_open(cipherText, publicKey, privateKey);
 
         assertArrayEquals(message, plaintext);
+    }
+
+    private boolean isJava9OrLater() {
+        String version = System.getProperty("java.version");
+        int majorVersion = Integer.parseInt(version.split("\\.")[0]);
+        return majorVersion >= 9;
     }
 
     /**
