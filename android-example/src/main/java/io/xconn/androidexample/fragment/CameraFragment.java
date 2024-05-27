@@ -93,7 +93,7 @@ public class CameraFragment extends Fragment {
                 != PackageManager.PERMISSION_GRANTED) {
             requestCameraPermission();
         } else {
-            startCamera();
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
     }
 
@@ -122,7 +122,7 @@ public class CameraFragment extends Fragment {
         assert bitmap != null;
         byte[] imageData = bitmapToByteArray(bitmap);
 
-        byte[] publicKey = hexToBytes(App.getString("public_key"));
+        byte[] publicKey = hexToBytes(App.getString(App.PREF_PUBLIC_KEY));
         Log.d("PublicKey", "Public Key: " + bytesToHex(publicKey));
 
         byte[] encryptedImageData = SealedBox.seal(imageData, publicKey);

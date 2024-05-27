@@ -67,13 +67,11 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
             }
             return false;
         });
-        showPasswordDialog();
-    }
-
-    private void showPasswordDialog() {
         Helpers.showPasswordDialog(requireContext(), this,
                 true);
     }
+
+   
 
     @Override
     public boolean onPasswordSubmit(String password) {
@@ -94,6 +92,7 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
         }
         navigateToCameraFragment();
     }
+
 
     @Override
     public void onDismissed(boolean dismissedAfterSubmit) {
@@ -141,7 +140,7 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
     }
 
     private boolean isCameraFragmentFocused() {
-        // Check if the fragment is attached to an activity
+
         if (isAdded()) {
             return !requireActivity().findViewById(R.id.menu_camera).isSelected();
         }
@@ -288,3 +287,4 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
         executorService.shutdown();
     }
 }
+

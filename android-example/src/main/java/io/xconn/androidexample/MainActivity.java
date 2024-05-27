@@ -53,13 +53,10 @@ public class MainActivity extends AppCompatActivity implements Helpers.PasswordD
         });
 
         if (!App.getBoolean("isDialogShown")) {
-            showPasswordDialog();
+            Helpers.showPasswordDialog(this, this, false);
         }
     }
 
-    private void showPasswordDialog() {
-        Helpers.showPasswordDialog(this, this, false);
-    }
 
     @Override
     public boolean onPasswordSubmit(String password) {
