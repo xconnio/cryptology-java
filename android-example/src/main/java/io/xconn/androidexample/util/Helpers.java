@@ -21,39 +21,7 @@ import io.xconn.androidexample.R;
 
 public class Helpers extends Application {
 
-    public static byte[] hexToBytes(String hexString) {
-        int len = hexString.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
-                    + Character.digit(hexString.charAt(i + 1), 16));
-        }
-        return data;
-    }
-
-    public static String bytesToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02X", b));
-        }
-        return sb.toString();
-    }
-
-    public static byte[] convertTo32Bytes(String input) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(input.getBytes());
-
-            // If the hash is less than 32 bytes, we pad it with zeros
-            byte[] result = new byte[32];
-            System.arraycopy(hash, 0, result, 0, Math.min(hash.length, 32));
-
-            return result;
-        } catch (NoSuchAlgorithmException e) {
-            Log.e("IOException", "Error reading or decrypting image data", e);
-            return null;
-        }
-    }
+    private static AlertDialog passwordDialog;
 
     public interface PasswordDialogListener {
         boolean onPasswordSubmit(String password);
@@ -82,7 +50,7 @@ public class Helpers extends Application {
             });
         }
 
-        AlertDialog passwordDialog = builder.create();
+        passwordDialog = builder.create();
         passwordDialog.show();
 
         boolean[] dismissedAfterSubmit = {false};
@@ -132,6 +100,39 @@ public class Helpers extends Application {
 
         if (passwordDialog.getButton(AlertDialog.BUTTON_POSITIVE) != null) {
             passwordDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        }
+    }
+
+    public static byte[] hexToBytes(String hexString) {int len = hexString.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                    + Character.digit(hexString.charAt(i + 1), 16));
+        }
+        return data;
+    }
+
+    public static String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
+    }
+
+    public static byte[] convertTo32Bytes(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes());
+
+            // If the hash is less than 32 bytes, we pad it with zeros
+            byte[] result = new byte[32];
+            System.arraycopy(hash, 0, result, 0, Math.min(hash.length, 32));
+
+            return result;
+        } catch (NoSuchAlgorithmException e) {
+            Log.e("Helpers", "Error generating hash", e);
+            return null;
         }
     }
 }
