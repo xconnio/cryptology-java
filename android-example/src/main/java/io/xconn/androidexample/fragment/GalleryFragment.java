@@ -71,7 +71,6 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
                 true);
     }
 
-   
 
     @Override
     public boolean onPasswordSubmit(String password) {
@@ -106,14 +105,11 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
 
 
     private void onBackPressed() {
-            if (isCameraFragmentFocused()) {
-                focusOnCameraFragment();
-            }
-            navigateToCameraFragment();
-
+        if (isCameraFragmentFocused()) {
+            focusOnCameraFragment();
+        }
+        navigateToCameraFragment();
     }
-
-
 
 
     private boolean decryptPrivateKey(String password) {
@@ -249,8 +245,7 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
             ImageView imageView;
         }
 
-        private void decodeAndDecryptImageDataAsync(final File imageFile, final ImageView imageView)
-        {
+        private void decodeAndDecryptImageDataAsync(final File imageFile, final ImageView imageView) {
             executorService.execute(() -> {
                 Bitmap bitmap = decryptImageData(imageFile);
                 mainHandler.post(() -> {
