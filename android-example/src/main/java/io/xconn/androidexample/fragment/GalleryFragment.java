@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,11 +31,11 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import io.xconn.cryptology.SealedBox;
-import io.xconn.cryptology.SecretBox;
 import io.xconn.androidexample.R;
 import io.xconn.androidexample.util.App;
 import io.xconn.androidexample.util.Helpers;
+import io.xconn.cryptology.SealedBox;
+import io.xconn.cryptology.SecretBox;
 
 public class GalleryFragment extends Fragment implements Helpers.PasswordDialogListener {
 
@@ -60,17 +59,9 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
         super.onViewCreated(view, savedInstanceState);
         requireActivity().findViewById(R.id.frameLayout).setFocusableInTouchMode(true);
         requireActivity().findViewById(R.id.frameLayout).requestFocus();
-        requireActivity().findViewById(R.id.frameLayout).setOnKeyListener((v, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
-                onBackPressed();
-                return true;
-            }
-            return false;
-        });
         Helpers.showPasswordDialog(requireContext(), this,
                 true);
     }
-
 
     @Override
     public boolean onPasswordSubmit(String password) {
@@ -104,14 +95,6 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
     }
 
 
-    private void onBackPressed() {
-        if (isCameraFragmentFocused()) {
-            focusOnCameraFragment();
-        }
-        navigateToCameraFragment();
-    }
-
-
     private boolean decryptPrivateKey(String password) {
         String encryptedPrivateKeyHex = App.getString(App.PREF_PRIVATE_KEY);
         String nonceHex = App.getString(App.PREF_NONCE);
@@ -136,7 +119,6 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
     }
 
     private boolean isCameraFragmentFocused() {
-
         if (isAdded()) {
             return !requireActivity().findViewById(R.id.menu_camera).isSelected();
         }

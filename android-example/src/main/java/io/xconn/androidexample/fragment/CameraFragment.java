@@ -34,9 +34,7 @@ import io.xconn.cryptology.SealedBox;
 import io.xconn.androidexample.R;
 import io.xconn.androidexample.util.App;
 
-
 public class CameraFragment extends Fragment {
-
 
     private ActivityResultLauncher<String> cameraPermissionLauncher;
     private ActivityResultLauncher<Intent> cameraLauncher;
