@@ -114,7 +114,7 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
 
     private boolean decryptPrivateKey(String password) {
         String encryptedPrivateKeyHex = App.getString(App.PREF_PRIVATE_KEY);
-        String nonceHex = App.getString("nonce");
+        String nonceHex = App.getString(App.PREF_NONCE);
 
         if (!TextUtils.isEmpty(encryptedPrivateKeyHex) && !TextUtils.isEmpty(nonceHex)) {
             byte[] encryptedPrivateKey = Helpers.hexToBytes(encryptedPrivateKeyHex);

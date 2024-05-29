@@ -11,7 +11,8 @@ public class App extends Application {
 
     public static final String PREF_PUBLIC_KEY = "public_key";
     public static final String PREF_PRIVATE_KEY = "private_key";
-
+    public static final String PREF_IS_DIALOG_SHOWN = "isDialogShown";
+    public static final String PREF_NONCE = "nonce";
 
     @Override
     public void onCreate() {

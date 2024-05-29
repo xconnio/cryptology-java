@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements Helpers.PasswordD
             return false;
         });
 
-        if (!App.getBoolean("isDialogShown")) {
+        if (!App.getBoolean(App.PREF_IS_DIALOG_SHOWN)) {
             Helpers.showPasswordDialog(this, this, false);
         }
     }
@@ -73,14 +73,14 @@ public class MainActivity extends AppCompatActivity implements Helpers.PasswordD
 
         // Generate nonce and save it
         byte[] nonce = SecretBox.generateNonce();
-        App.saveString("nonce", bytesToHex(nonce));
+        App.saveString(App.PREF_NONCE, bytesToHex(nonce));
 
         // Encrypt private key with entered password and save it
         byte[] encryptedPrivateKey = SecretBox.box(nonce, keyPair.getPrivateKey(),
                 Objects.requireNonNull(convertTo32Bytes(password)));
         App.saveString(App.PREF_PRIVATE_KEY, bytesToHex(encryptedPrivateKey));
 
-        App.saveBoolean("isDialogShown", true);
+        App.saveBoolean(App.PREF_IS_DIALOG_SHOWN, true);
         return true;
     }
 
