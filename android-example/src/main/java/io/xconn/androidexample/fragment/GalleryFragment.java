@@ -264,4 +264,3 @@ public class GalleryFragment extends Fragment implements Helpers.PasswordDialogL
         executorService.shutdown();
     }
 }
-

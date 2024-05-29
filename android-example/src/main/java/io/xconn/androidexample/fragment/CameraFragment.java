@@ -7,7 +7,6 @@ import static io.xconn.androidexample.util.Helpers.hexToBytes;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -21,7 +20,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import java.io.ByteArrayOutputStream;
@@ -30,9 +28,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
-import io.xconn.cryptology.SealedBox;
 import io.xconn.androidexample.R;
 import io.xconn.androidexample.util.App;
+import io.xconn.cryptology.SealedBox;
 
 public class CameraFragment extends Fragment {
 
@@ -50,7 +48,8 @@ public class CameraFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        view.findViewById(R.id.button_capture).setOnClickListener(v -> dispatchTakePictureIntent());
+        view.findViewById(R.id.button_capture).setOnClickListener(v ->
+                cameraPermissionLauncher.launch(Manifest.permission.CAMERA));
         view.findViewById(R.id.button_select_photo).setOnClickListener(v -> openGallery());
 
         // Initialize ActivityResultLaunchers
@@ -84,19 +83,6 @@ public class CameraFragment extends Fragment {
                     }
                 }
         );
-    }
-
-    private void dispatchTakePictureIntent() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestCameraPermission();
-        } else {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
-        }
-    }
-
-    private void requestCameraPermission() {
-        cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
     }
 
     @SuppressLint("QueryPermissionsNeeded")
