@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -46,10 +47,38 @@ public class MainActivity extends AppCompatActivity implements Helpers.PasswordD
             }
 
             if (fragment != null) {
-                fragmentManager.beginTransaction().replace(R.id.frameLayout, fragment).commit();
+                Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
+
+                // Do nothing if already on the selected fragment
+                if (currentFragment != null && currentFragment.getClass().equals(fragment.getClass())) {
+                    return true;
+                }
+
+                // Clear the backstack
+                fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+                FragmentTransaction transaction = fragmentManager.beginTransaction()
+                        .replace(R.id.frameLayout, fragment);
+
+                // Add to backstack if it's GalleryFragment
+                if (fragment instanceof GalleryFragment) {
+                    transaction.addToBackStack(null);
+                }
+
+                transaction.commit();
                 return true;
             }
             return false;
+        });
+
+        fragmentManager.addOnBackStackChangedListener(() -> {
+            Fragment currentFragment = fragmentManager.findFragmentById(R.id.frameLayout);
+
+            if (currentFragment instanceof CameraFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.menu_camera);
+            } else if (currentFragment instanceof GalleryFragment) {
+                bottomNavigationView.setSelectedItemId(R.id.menu_gallery);
+            }
         });
 
         if (!App.getBoolean(App.PREF_IS_DIALOG_SHOWN)) {
